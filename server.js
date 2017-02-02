@@ -14,13 +14,13 @@ var port = 3001;
 
 var stylesheet = fs.readFileSync('gallery.css');
 
-var imageNames = ['ace.jpg','bubble.jpg','chess.jpg'];
+var imageNames = ['/ace','/bubble','/chess','/fern','/mobile'];
 
-var server = http.createServer(function(req, res){
+
 	
 function serveImage(filename,req,res){
 														// readfile will store in ram - cashe so it is easy to accesss
-	var body = fs.readFile('images/' +filename, function(err,body){ // delete the sync part to async it
+	fs.readFile('images/' +filename, function(err,body){ // delete the sync part to async it
 	if(err){
 			console.error(err);
 			res.statusCode  = 500;
@@ -29,36 +29,40 @@ function serveImage(filename,req,res){
 			return;
 		}
 		
-		res.setHeader("Content-Type","images\jpeg");
+		res.setHeader("Content-Type","image/jpeg");
 		res.end(body);
 	});
 	
 }	
+var server = http.createServer(function(req, res){
 	
 switch(req.url){
 	case "/gallery":
+		var html = '<!doctype html>';
 		//res.end("Hello.Time is "+ Date.now());
-var ghtml = imageNames.map(function(fileName){
-	'<img src="images/' +fileName+' alt="a fishing ace at work" >'
-});	
-	var html = '<!doctype html>';
-		html += '<head><title>Dishan Gallery</title></head>';
+		var ghtml = imageNames.map(function(fileName){
+			return ' <img src="' + fileName + '">';
+		}).join();	
+		
+		html += '<head><title>Dishan Gallery</title>';
 		//html += 'Hello.Time is '+ Date.now();
 		html += '<link href="gallery.css" rel="stylesheet" type="text/css" >';
+		html += '</head>'; 
 		html += '<body>';
 		html += '<h1>Gallery</h1>';
 		//html += '<img src="images/ace.jpg" alt="a fishing ace at work" >';
 		html += ghtml;
 		html += '</body>';
-		res.setHeader('content-Tyep','text/html');
+		res.setHeader('content-Type','text/html');
 		res.end(html);
-		break;
-	case "/chess":
-		serveImage('chess.jpg',req,res);
 		break;
 	case"/gallery.css":
 		res.setHeader('Content-Tyep','text/css');
 		res.end(stylesheet);
+		break;		
+	case "/chess":
+		serveImage('chess.jpg',req,res);
+		break;
 	case"/fern":	
 	case"/fern/":
 	case"/fern.jpg/":
@@ -67,6 +71,9 @@ var ghtml = imageNames.map(function(fileName){
 		break;
 	case"/ace":
 		serveImage('ace.jpg',req,res);
+		break;
+	case"/mobile":
+		serveImage('mobile.jpg',req,res);
 		break;
 	default:
 		res.statusCode = 404;

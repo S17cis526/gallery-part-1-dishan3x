@@ -11,6 +11,7 @@ var http = require('http');
 var url = require('url');
 var fs = require('fs');
 var template = require('./template');
+var staticFiles = require('./static');
 var port = 3026;
 
 /* load cached files */
@@ -18,6 +19,8 @@ var config = JSON.parse(fs.readFileSync('config.json'));
 var stylesheet = fs.readFileSync('public/gallery.css');
 var script = fs.readFileSync('public/gallery.js');
 
+/* load public directory */
+staticFiles.loadDir('public');
 
 
 template.loadDir('templates');
@@ -163,17 +166,15 @@ function handleRequest(req, res) {
         uploadImage(req, res);
       }
       break;
-    case '/gallery.css':
-      res.setHeader('Content-Type', 'text/css');
-      res.end(stylesheet);
-      break;
-	case '/gallery.js':
-      res.setHeader('Content-Type', 'text/javascript');
-      res.end(script);
-      break;  
-    default:
-      serveImage(req.url, req, res);
-  }
+      default:
+            // inserting 'public' is a crappy solution, btw
+            if (staticFiles.isCached('public' + req.url)) {
+                staticFiles.serveFile('public' + req.url, req, res);
+            }
+            else {
+                serveImage(req.url, req, res);
+            }
+    }
 }
 
 /* Create and launch the webserver */

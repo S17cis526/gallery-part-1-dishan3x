@@ -10,12 +10,15 @@ var multipart = require('./multipart');
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
-var template = require('./templates')
-var port = 3000;
+var template = require('./template');
+var port = 3026;
 
 /* load cached files */
 var config = JSON.parse(fs.readFileSync('config.json'));
-var stylesheet = fs.readFileSync('gallery.css');
+var stylesheet = fs.readFileSync('public/gallery.css');
+var script = fs.readFileSync('public/gallery.js');
+
+
 
 template.loadDir('templates');
 /** @function getImageNames
@@ -52,11 +55,11 @@ function imageNamesToTags(fileNames) {
  * gallery images.
  */
 function buildGallery(imageTags) {
-	return template.render 
-return template.render('gallery'){// sending the object
-	title : config.title,
-	imagetags : imageNamesToTags.(imageTags).join('')
-	});
+
+  return template.render("gallery.html",{
+		title:config.title,
+		imageTags:imageNamesToTags(imageTags).join('')
+		});
 }
 
 
@@ -97,7 +100,6 @@ function serveImage(fileName, req, res) {
       res.end();
       return;
     }
-	var res = fileName.split(".");
     res.setHeader('Content-Type', 'image/*');
     res.end(data);
   });
@@ -165,6 +167,10 @@ function handleRequest(req, res) {
       res.setHeader('Content-Type', 'text/css');
       res.end(stylesheet);
       break;
+	case '/gallery.js':
+      res.setHeader('Content-Type', 'text/javascript');
+      res.end(script);
+      break;  
     default:
       serveImage(req.url, req, res);
   }

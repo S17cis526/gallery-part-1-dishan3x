@@ -1,0 +1,19 @@
+img {
+  width: 250px;
+}
+#gallery-title-edit{
+	display:none;
+}
+
+#galler-title{
+	cursor:pointer;
+}
+#image-upload-form{
+	display:flex;
+	flex-direction : column;
+	flex-items:center;
+	boder : 10px solid red;
+	border-radius:5px;
+	background-color: pink;
+}
+
